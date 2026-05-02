@@ -83,14 +83,22 @@ const upcoming = upcomingRows.map(toTile);
       <h1 class="text-3xl font-semibold tracking-tight">Reminders</h1>
       <a
         href="/new"
-        class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+        class="hidden min-h-10 items-center rounded-md bg-indigo-600 px-3 text-sm font-medium text-white hover:bg-indigo-700 sm:inline-flex"
       >
         + New task
       </a>
     </div>
 
-    <div class="mt-8">
+    <div class="mt-8 pb-24 sm:pb-0">
       <Dashboard client:load todays={todays} upcoming={upcoming} categories={cats} stats={stats} />
     </div>
   </main>
+
+  <a
+    href="/new"
+    aria-label="New task"
+    class="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-2xl font-semibold text-white shadow-lg hover:bg-indigo-700 sm:hidden"
+  >
+    +
+  </a>
 </BaseLayout>

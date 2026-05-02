@@ -116,7 +116,7 @@ export default function ProfileForm({ initial }: Props) {
               key={c}
               onClick={() => setReminderChannel(c)}
               className={
-                'flex-1 rounded-md border px-3 py-1.5 text-sm capitalize ' +
+                'min-h-11 flex-1 rounded-md border px-3 text-sm capitalize ' +
                 (reminderChannel === c
                   ? 'border-indigo-600 bg-indigo-600 text-white'
                   : 'border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800')
