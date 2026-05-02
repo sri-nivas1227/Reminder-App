@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Scheduled function fires the cron dispatcher every minute.
+# Schedule is in UTC. Cron syntax: minute hour day month weekday.
+[functions."dispatch-reminders"]
+  schedule = "* * * * *"

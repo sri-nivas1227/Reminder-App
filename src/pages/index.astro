@@ -1,0 +1,96 @@
+---
+import { DateTime } from 'luxon';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NavHeader from '../components/layout/NavHeader.astro';
+import Dashboard, { type OccurrenceTile } from '../components/tasks/Dashboard';
+import { db } from '../lib/db/client';
+import { task, taskOccurrence } from '../lib/db/schema';
+import { listCategories, listOccurrences, statsFor } from '../lib/db/queries';
+import { occurrencesBetween, type RecurrenceRule } from '../lib/recurrence';
+import { eq } from 'drizzle-orm';
+
+const user = Astro.locals.user!;
+const tz = (user as { timezone?: string }).timezone ?? 'America/Los_Angeles';
+
+// Lazy-materialize: ensure the next 30 days of occurrences exist for active tasks.
+{
+  const tasks = await db.query.task.findMany({
+    where: eq(task.userId, user.id),
+  });
+  const now = new Date();
+  const horizon = new Date(Date.now() + 30 * 86400_000);
+  for (const t of tasks) {
+    if (!t.isActive) continue;
+    const dates = occurrencesBetween(
+      t.recurrenceConfig as unknown as RecurrenceRule,
+      t.reminderTime,
+      now,
+      horizon,
+      tz,
+    );
+    if (dates.length) {
+      await db
+        .insert(taskOccurrence)
+        .values(dates.map((d) => ({ taskId: t.id, scheduledFor: d })))
+        .onConflictDoNothing();
+    }
+  }
+}
+
+const todayStartLocal = DateTime.now().setZone(tz).startOf('day');
+const todayEndLocal = todayStartLocal.endOf('day');
+const weekEndLocal = todayStartLocal.plus({ days: 7 });
+
+const todayStart = todayStartLocal.toUTC().toJSDate();
+const todayEnd = todayEndLocal.toUTC().toJSDate();
+const weekEnd = weekEndLocal.toUTC().toJSDate();
+
+const [todayRows, upcomingRows, cats, stats, allTasks] = await Promise.all([
+  listOccurrences(user.id, todayStart, todayEnd),
+  listOccurrences(user.id, todayEnd, weekEnd),
+  listCategories(user.id),
+  statsFor(user.id),
+  db.query.task.findMany({ where: eq(task.userId, user.id) }),
+]);
+
+const ruleByTaskId = new Map<string, RecurrenceRule>(
+  allTasks.map((t) => [t.id, t.recurrenceConfig as unknown as RecurrenceRule]),
+);
+const activeByTaskId = new Map<string, boolean>(allTasks.map((t) => [t.id, t.isActive]));
+
+const toTile = (r: (typeof todayRows)[number]): OccurrenceTile => ({
+  occurrenceId: r.occurrenceId,
+  scheduledFor: r.scheduledFor.toISOString(),
+  status: r.status,
+  taskId: r.taskId,
+  title: r.title,
+  reminderTime: r.reminderTime,
+  isActive: activeByTaskId.get(r.taskId) ?? true,
+  categoryId: r.categoryId,
+  categoryName: r.categoryName,
+  categoryColor: r.categoryColor,
+  recurrence: ruleByTaskId.get(r.taskId)!,
+});
+
+const todays = todayRows.map(toTile);
+const upcoming = upcomingRows.map(toTile);
+---
+
+<BaseLayout title="Dashboard · Reminder App">
+  <NavHeader current="dashboard" email={user.email} />
+  <main class="mx-auto max-w-5xl p-6 sm:p-8">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h1 class="text-3xl font-semibold tracking-tight">Reminders</h1>
+      <a
+        href="/new"
+        class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+      >
+        + New task
+      </a>
+    </div>
+
+    <div class="mt-8">
+      <Dashboard client:load todays={todays} upcoming={upcoming} categories={cats} stats={stats} />
+    </div>
+  </main>
+</BaseLayout>

@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NavHeader from '../components/layout/NavHeader.astro';
+import ProfileForm from '../components/profile/ProfileForm';
+import PasswordForm from '../components/profile/PasswordForm';
+import { db } from '../lib/db/client';
+import { user } from '../lib/db/schema';
+import { eq } from 'drizzle-orm';
+
+const ctx = Astro.locals.user!;
+const row = await db.query.user.findFirst({ where: eq(user.id, ctx.id) });
+const initial = {
+  name: row?.name ?? '',
+  phone: row?.phone ?? null,
+  timezone: row?.timezone ?? 'America/Los_Angeles',
+  reminderChannel: (row?.reminderChannel ?? 'email') as 'email' | 'sms' | 'both',
+};
+---
+
+<BaseLayout title="Profile · Reminder App">
+  <NavHeader current="profile" email={ctx.email} />
+  <main class="mx-auto max-w-xl p-6 sm:p-8">
+    <h1 class="text-3xl font-semibold tracking-tight">Profile</h1>
+    <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+      {ctx.email}
+    </p>
+
+    <section class="mt-6 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <h2 class="mb-4 text-lg font-semibold">Personal info</h2>
+      <ProfileForm client:load initial={initial} />
+    </section>
+
+    <section class="mt-6 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <h2 class="mb-4 text-lg font-semibold">Password</h2>
+      <PasswordForm client:load />
+    </section>
+  </main>
+</BaseLayout>
