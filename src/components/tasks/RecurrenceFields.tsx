@@ -95,7 +95,7 @@ export default function RecurrenceFields({ value, onChange }: Props) {
                     onChange({ ...value, days: next });
                   }}
                   className={
-                    'rounded-md border px-3 py-1.5 text-sm ' +
+                    'min-h-11 min-w-11 rounded-md border px-3 text-sm ' +
                     (active
                       ? 'border-indigo-600 bg-indigo-600 text-white'
                       : 'border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800')
@@ -127,7 +127,7 @@ export default function RecurrenceFields({ value, onChange }: Props) {
                     onChange({ ...value, days: next });
                   }}
                   className={
-                    'rounded-md border py-1.5 text-xs ' +
+                    'min-h-10 rounded-md border text-sm ' +
                     (active
                       ? 'border-indigo-600 bg-indigo-600 text-white'
                       : 'border-neutral-300 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800')

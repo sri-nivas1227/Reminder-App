@@ -185,14 +185,14 @@ function Tile({
           <button
             type="button"
             onClick={() => onSetStatus('done')}
-            className="flex-1 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+            className="min-h-10 flex-1 rounded-md bg-emerald-600 px-3 text-sm font-medium text-white hover:bg-emerald-700"
           >
             Done
           </button>
           <button
             type="button"
             onClick={() => onSetStatus('missed')}
-            className="flex-1 rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+            className="min-h-10 flex-1 rounded-md border border-neutral-300 px-3 text-sm font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
           >
             Missed
           </button>
@@ -226,9 +226,11 @@ function StatCard({
     indigo: 'text-indigo-600',
   }[tone];
   return (
-    <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="text-xs uppercase tracking-wide text-neutral-500">{label}</div>
-      <div className={'mt-1 text-2xl font-semibold ' + toneCls}>{value}</div>
+    <div className="rounded-lg border border-neutral-200 bg-white p-3 sm:p-4 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="truncate text-[10px] uppercase tracking-wide text-neutral-500 sm:text-xs">
+        {label}
+      </div>
+      <div className={'mt-1 text-xl font-semibold sm:text-2xl ' + toneCls}>{value}</div>
     </div>
   );
 }
@@ -257,7 +259,7 @@ function Modal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-md p-1 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            className="flex h-10 w-10 items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             ✕
           </button>
