@@ -18,15 +18,19 @@ const { title = 'Reminder App' } = Astro.props;
     <script is:inline>
       (function () {
         try {
-          var t = localStorage.getItem('theme');
+          const t = localStorage.getItem('theme');
           if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
           }
-        } catch (_) {}
+        } catch (e) {
+          // Ignore
+        }
       })();
     </script>
   </head>
-  <body class="h-full bg-neutral-50 text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100">
+  <body
+    class="h-full bg-neutral-50 text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100"
+  >
     <slot />
   </body>
 </html>
